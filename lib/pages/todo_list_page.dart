@@ -11,7 +11,7 @@ class TodoListPage extends StatefulWidget {
 
 class _TodoListPageState extends State<TodoListPage> {
 
-  TextEditingController _newItemController = TextEditingController();
+  TextEditingController _taskController = TextEditingController();
   List _tasks = [];
 
   @override
@@ -54,9 +54,9 @@ class _TodoListPageState extends State<TodoListPage> {
     return task;
   }
 
-  _handleAddNewItem() {
+  _addNewItem() {
     setState(() {
-      var newItem = _createTask(_newItemController.text);
+      var newItem = _createTask(_taskController.text);
       _tasks.add(newItem);
     });
     _saveFile();
@@ -72,28 +72,35 @@ class _TodoListPageState extends State<TodoListPage> {
             decoration: InputDecoration(
               labelText: 'Type your task here',
             ),
-            controller: _newItemController
+            controller: _taskController
           ),
           actions: [
             TextButton(
               child: Text('Cancel'),
               onPressed: () {
                 Navigator.pop(context);
-                _newItemController.text = '';
+                _taskController.text = '';
               }
             ),
             TextButton(
               child: Text('Save'),
               onPressed: () {
-                _handleAddNewItem();
+                _addNewItem();
                 Navigator.pop(context);
-                _newItemController.text = '';
+                _taskController.text = '';
               }
             ),
           ]
         );
       }
     );
+  }
+
+  _handleCheckChange(bool isChecked, int index) {
+    setState(() {
+      _tasks[index]['done'] = isChecked;
+    });
+    _saveFile();
   }
 
   @override
@@ -106,8 +113,10 @@ class _TodoListPageState extends State<TodoListPage> {
       body: Container(
         child: ListView.builder(
           itemCount: _tasks.length,
-          itemBuilder: (context, index) => ListTile(
+          itemBuilder: (context, index) => CheckboxListTile(
             title: Text(_tasks[index]['title']),
+            value: _tasks[index]['done'],
+            onChanged: (isChecked) => _handleCheckChange(isChecked, index)
           )
         )
       ),
