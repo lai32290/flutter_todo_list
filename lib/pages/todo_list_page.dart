@@ -103,6 +103,13 @@ class _TodoListPageState extends State<TodoListPage> {
     _saveFile();
   }
 
+  _handleDelete(int index) {
+    setState(() {
+      _tasks.removeAt(index);
+    });
+    _saveFile();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -113,11 +120,32 @@ class _TodoListPageState extends State<TodoListPage> {
       body: Container(
         child: ListView.builder(
           itemCount: _tasks.length,
-          itemBuilder: (context, index) => CheckboxListTile(
-            title: Text(_tasks[index]['title']),
-            value: _tasks[index]['done'],
-            onChanged: (isChecked) => _handleCheckChange(isChecked, index)
-          )
+          itemBuilder: (context, index) {
+            final item = _tasks[index];
+
+            return Dismissible(
+              key: Key(item.toString()), 
+              direction: DismissDirection.endToStart,
+              onDismissed: (direction) {
+                _handleDelete(index);
+              },
+              background: Container(
+                color: Colors.redAccent,
+                padding: EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text('Delete', style: TextStyle(color: Colors.white))
+                  ]
+                )
+              ),
+              child: CheckboxListTile(
+                title: Text(item['title']),
+                value: item['done'],
+                onChanged: (isChecked) => _handleCheckChange(isChecked, index),
+              ),
+            );
+        }
         )
       ),
       floatingActionButton: FloatingActionButton(
