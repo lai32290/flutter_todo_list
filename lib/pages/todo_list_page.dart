@@ -104,6 +104,23 @@ class _TodoListPageState extends State<TodoListPage> {
   }
 
   _handleDelete(int index) {
+    final item = _tasks[index];
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        key: Key(index.toString()),
+        duration: Duration(seconds: 5),
+        content: Text('${item['title']} removed'),
+        action: SnackBarAction(
+          label: 'Undo',
+          onPressed: () {
+            setState(() {
+              _tasks.insert(index, item);
+              _saveFile();
+            });
+          }
+        )
+      )
+    );
     setState(() {
       _tasks.removeAt(index);
     });
